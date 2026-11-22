@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#171815">
+<title>MyLinkAI — Your links, your identity</title>
+<style>
+:root{--text:#fff;--muted:rgba(255,255,255,.78);--glass:rgba(255,255,255,.23);--line:rgba(255,255,255,.34);--shadow:0 18px 55px rgba(0,0,0,.22)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text)}
+body{min-height:100vh;background:#171815}
+.page{position:relative;isolation:isolate;min-height:100vh;overflow:hidden;padding:24px 18px 54px;display:flex;justify-content:center}
+.backdrop{position:fixed;inset:0;z-index:-2;background:linear-gradient(180deg,rgba(0,0,0,.08) 0%,rgba(0,0,0,.24) 38%,rgba(0,0,0,.82) 75%,#11130f 100%),var(--bg-image,radial-gradient(ellipse at 50% 25%,#8d8179,#4c4944 55%,#20221d));background-size:cover;background-position:center;transform:scale(1.02)}
+.backdrop:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 25%,rgba(10,12,9,.15) 43%,rgba(10,12,9,.78) 73%,#11130f 100%)}
+.wrap{width:min(100%,660px);display:flex;flex-direction:column;align-items:center;text-align:center}
+.topbar{width:100%;display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-bottom:18px}
+.round{width:42px;height:42px;border:1px solid var(--line);border-radius:50%;background:rgba(255,255,255,.18);color:white;display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(14px);font-size:19px}
+.hero{width:100%;padding-top:10px}
+.avatar{width:112px;height:112px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.75);box-shadow:0 10px 35px #0005;background:#262820;display:none;margin:0 auto 16px}
+.initial{width:112px;height:112px;border-radius:50%;margin:0 auto 16px;display:grid;place-items:center;font-size:42px;font-weight:700;background:linear-gradient(145deg,#777b72,#252820);border:3px solid rgba(255,255,255,.75);box-shadow:0 10px 35px #0005}
+h1{font-size:clamp(36px,8vw,72px);line-height:1.05;letter-spacing:-2.8px;font-weight:650;margin:18px 0 26px;text-shadow:0 3px 18px #0005}
+.socials{display:flex;justify-content:center;align-items:center;gap:24px;margin:0 0 24px}
+.socials a{color:white;text-decoration:none;width:48px;height:48px;display:grid;place-items:center;transition:transform .2s}
+.socials a:hover{transform:translateY(-3px) scale(1.06)}
+.socials svg{width:42px;height:42px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.socials .fb{font-family:Arial,sans-serif;font-size:48px;font-weight:bold}
+.verified{display:inline-flex;align-items:center;gap:8px;font-size:16px;color:#eee;margin-bottom:54px;background:rgba(0,0,0,.22);padding:7px 14px;border-radius:24px;backdrop-filter:blur(8px)}
+.check{width:23px;height:23px;border-radius:50%;background:#18aef5;display:grid;place-items:center;font-size:15px;font-weight:900;color:white}
+.links{width:100%;display:flex;flex-direction:column;gap:24px;padding:0 0 24px}
+.link{min-height:112px;width:100%;display:flex;align-items:center;position:relative;padding:14px 24px;border:1px solid var(--line);border-radius:100px;background:var(--glass);box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.2);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);color:white;text-decoration:none;transition:transform .2s,background .2s}
+.link:hover{transform:translateY(-3px);background:rgba(255,255,255,.3)}
+.link-icon{width:78px;height:78px;flex:0 0 78px;border-radius:50%;display:grid;place-items:center;background:rgba(0,0,0,.55);font-size:38px}
+.link-icon svg{width:42px;height:42px;fill:none;stroke:white;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.link-label{font-size:clamp(17px,3.4vw,26px);font-weight:550;flex:1;padding:0 12px}
+.more{font-size:25px;color:rgba(255,255,255,.7);padding:0 8px}
+.brand{margin-top:18px;font-size:12px;letter-spacing:2px;color:rgba(255,255,255,.55);text-transform:uppercase}
+.brand b{color:#fff}
+.edit-panel{position:fixed;inset:0;background:rgba(0,0,0,.68);z-index:5;display:none;align-items:center;justify-content:center;padding:18px}
+.edit-panel.open{display:flex}
+.dialog{width:min(100%,500px);max-height:90vh;overflow:auto;background:#191c1b;border:1px solid #ffffff30;border-radius:22px;padding:22px;text-align:left;box-shadow:0 25px 80px #0009}
+.dialog h2{margin:0 0 16px;font-size:23px}.field{display:block;margin:13px 0;color:#ddd;font-size:13px}
+.field input{display:block;width:100%;margin-top:7px;padding:12px 13px;border-radius:10px;border:1px solid #ffffff35;background:#292d2b;color:#fff;font:inherit;outline:none}
+.field input:focus{border-color:#7aa8ff}
+.actions{display:flex;gap:10px;margin-top:20px}.btn{border:0;border-radius:11px;padding:12px 17px;font-weight:650;cursor:pointer}.primary{background:#fff;color:#171815}.secondary{background:#343a36;color:#fff}
+.note{font-size:12px;line-height:1.5;color:#aeb5b0}
+@media(max-width:480px){.page{padding:18px 17px 40px}.topbar{margin-bottom:8px}.hero{padding-top:8px}.verified{margin-bottom:48px}.link{min-height:96px;padding:11px 16px}.link-icon{width:66px;height:66px;flex-basis:66px}.links{gap:20px}h1{margin-top:14px}.brand{margin-top:12px}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="backdrop" id="backdrop"></div>
+  <main class="wrap">
+    <div class="topbar">
+      <button class="round" id="shareBtn" aria-label="Share profile" title="Share profile">↗</button>
+
+    </div>
+    <section class="hero">
+      <img class="avatar" id="avatar" alt="Profile photo">
+      <div class="initial" id="initial">M</div>
+      <h1 id="profileName">MyLinkAI</h1>
+      <nav class="socials" id="socials" aria-label="Social links">
+        <a href="#" data-social="website" aria-label="Website" title="Website"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="19"/><path d="M5 24h38M24 5c6 6 9 12 9 19s-3 13-9 19c-6-6-9-12-9-19s3-13 9-19z"/></svg></a>
+        <a href="#" data-social="instagram" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 48 48"><rect x="5" y="5" width="38" height="38" rx="11"/><circle cx="24" cy="24" r="9"/><circle cx="36" cy="12" r="2" fill="currentColor" stroke="none"/></svg></a>
+        <a href="#" data-social="facebook" aria-label="Facebook" title="Facebook"><span class="fb">f</span></a>
+      </nav>
+      <div class="verified" id="verified"><span class="check">✓</span><span>Verified</span></div>
+    </section>
+    <section class="links" id="links">
+      <a class="link" href="#" target="_blank" rel="noopener"><span class="link-icon">👑</span><span class="link-label">PusoAI</span><span class="more">⋮</span></a>
+      <a class="link" href="#" target="_blank" rel="noopener"><span class="link-icon"><svg viewBox="0 0 48 48"><rect x="5" y="5" width="38" height="38" rx="11"/><circle cx="24" cy="24" r="9"/><circle cx="36" cy="12" r="2" fill="white" stroke="none"/></svg></span><span class="link-label">Instagram</span><span class="more">⋮</span></a>
+      <a class="link" href="#" target="_blank" rel="noopener"><span class="link-icon" style="font-family:Arial;font-size:54px;font-weight:bold">f</span><span class="link-label">Facebook</span><span class="more">⋮</span></a>
+    </section>
+    <div class="brand">Made with <b>MyLinkAI</b></div>
+  </main>
+</div>
+
+<div class="edit-panel" id="editPanel" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+ <div class="dialog">
+  <h2 id="editTitle">Customize your profile</h2>
+  <label class="field">Display name<input id="nameInput" placeholder="Your name"></label>
+  <label class="field">Profile photo<input id="avatarInput" type="file" accept="image/*"></label>
+  <label class="field">Background photo<input id="bgInput" type="file" accept="image/*"></label>
+  <label class="field">Website URL<input id="websiteInput" type="url" placeholder="https://example.com"></label>
+  <label class="field">Instagram URL<input id="instagramInput" type="url" placeholder="https://instagram.com/username"></label>
+  <label class="field">Facebook URL<input id="facebookInput" type="url" placeholder="https://facebook.com/username"></label>
+  <label class="field">PusoAI button title<input id="liveTitleInput" placeholder="PusoAI"></label>
+  <label class="field">PusoAI website URL<input id="liveUrlInput" type="url" placeholder="https://..."></label>
+  <p class="note">Changes are saved in this browser on this device. This standalone demo does not yet sync across visitors.</p>
+  <div class="actions"><button class="btn primary" id="saveBtn">Save changes</button><button class="btn secondary" id="closeBtn">Cancel</button></div>
+ </div>
+</div>
+
+<div class="edit-panel" id="adminPanel" role="dialog" aria-modal="true" aria-labelledby="adminHeading">
+ <div class="dialog">
+  <h2 id="adminHeading">MyLinkAI Admin</h2>
+  <div id="adminLogin">
+   <p class="note">Sign in to manage your profile and links.</p>
+   <label class="field">Admin password<input id="adminPassword" type="password" placeholder="Enter admin password"></label>
+   <div class="actions"><button class="btn primary" id="adminLoginBtn">Sign in</button><button class="btn secondary" id="adminCancelBtn">Close</button></div>
+   <p class="note">Admin password updated.  Change this in the page code before publishing. This browser-only login is not secure authentication.</p>
+  </div>
+  <div id="adminControls" style="display:none">
+   <label class="field">Profile name<input id="adminName" placeholder="Your name"></label>
+   <label class="field">Profile photo<input id="adminAvatar" type="file" accept="image/*"></label>
+   <label class="field">Background photo<input id="adminBackground" type="file" accept="image/*"></label>
+   <label class="field">Website URL<input id="adminWebsite" type="url" placeholder="https://example.com"></label>
+   <label class="field">Instagram URL<input id="adminInstagram" type="url" placeholder="https://instagram.com/username"></label>
+   <label class="field">Facebook URL<input id="adminFacebook" type="url" placeholder="https://facebook.com/username"></label>
+   <label class="field">Verified badge <select id="adminVerified" style="display:block;width:100%;margin-top:7px;padding:12px;border-radius:10px;background:#292d2b;color:#fff;border:1px solid #ffffff35"><option value="true">Show verified badge</option><option value="false">Hide verified badge</option></select></label>
+   <h3 style="margin:20px 0 8px">Main link button</h3>
+   <label class="field">PusoAI button title<input id="adminLiveTitle" placeholder="PusoAI"></label>
+   <label class="field">PusoAI website URL<input id="adminLiveUrl" type="url" placeholder="https://..."></label>
+   <h3 style="margin:20px 0 8px">Extra links</h3>
+   <div id="extraLinks"></div>
+   <button class="btn secondary" id="addLinkBtn" type="button">＋ Add link</button>
+   <p class="note" style="margin-top:16px">Admin edits are stored in this browser only. A real public admin system needs server-side authentication, database storage and protected image uploads.</p>
+   <div class="actions"><button class="btn primary" id="adminSaveBtn">Save & publish locally</button><button class="btn secondary" id="adminLogoutBtn">Log out</button><button class="btn secondary" id="adminCloseBtn">Close</button></div>
+  </div>
+ </div>
+</div>
+
+<script>
+const defaults={name:"MyLinkAI",website:"https://pusoai.online/",instagram:"https://www.instagram.com/pusoai.online?hvrq=aWw5Z2RudTRrdDZt",facebook:"https://www.facebook.com/share/1cuoDvg77Q/",liveTitle:"PusoAI",liveUrl:"https://pusoai.online/",avatar:"",background:"",verified:true,extraLinks:[]};
+let data={...defaults};
+try{data={...data,...JSON.parse(localStorage.getItem("mylinkai-profile")||"{}")}}catch(e){}
+data.website="https://pusoai.online/";data.instagram="https://www.instagram.com/pusoai.online?hvrq=aWw5Z2RudTRrdDZt";data.facebook="https://www.facebook.com/share/1cuoDvg77Q/";data.liveTitle="PusoAI";data.liveUrl="https://pusoai.online/";
+const $=id=>document.getElementById(id);
+function safeUrl(v){if(!v)return "#";try{const u=new URL(v);return ["http:","https:"].includes(u.protocol)?u.href:"#"}catch{return "#"}}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function iconMarkup(kind){
+ if(kind==="instagram")return '<svg viewBox="0 0 48 48"><rect x="5" y="5" width="38" height="38" rx="11"/><circle cx="24" cy="24" r="9"/><circle cx="36" cy="12" r="2" fill="white" stroke="none"/></svg>';
+ if(kind==="facebook")return '<span style="font-family:Arial;font-size:54px;font-weight:bold">f</span>';
+ if(kind==="website")return '<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="19"/><path d="M5 24h38M24 5c6 6 9 12 9 19s-3 13-9 19c-6-6-9-12-9-19s3-13 9-19z"/></svg>';
+ return escapeHtml(kind||"↗");
+}
+function render(){
+ $("profileName").textContent=data.name||"MyLinkAI";$("initial").textContent=(data.name||"M").trim().charAt(0).toUpperCase();
+ if(data.avatar){$("avatar").src=data.avatar;$("avatar").style.display="block";$("initial").style.display="none"}else{$("avatar").style.display="none";$("initial").style.display="grid"}
+ if(data.background)$("backdrop").style.backgroundImage=`linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.82) 75%,#11130f),url("${data.background}")`;
+ $("verified").style.display=data.verified===false?"none":"inline-flex";
+ const socials={website:data.website,instagram:data.instagram,facebook:data.facebook};
+ document.querySelectorAll("[data-social]").forEach(a=>{const url=safeUrl(socials[a.dataset.social]);a.href=url;a.style.opacity=url==="#"?".45":"1";a.style.pointerEvents=url==="#"?"none":"auto"});
+ const links=[
+  {title:"PusoAI",url:"https://pusoai.online/",kind:"website",icon:"🌐"},
+  {title:"Instagram",url:data.instagram,kind:"instagram"},
+  {title:"Facebook",url:data.facebook,kind:"facebook"},
+  ...(Array.isArray(data.extraLinks)?data.extraLinks:[])
+ ];
+ $("links").innerHTML=links.map(x=>`<a class="link" href="${safeUrl(x.url)}" target="_blank" rel="noopener"><span class="link-icon">${x.kind==="instagram"||x.kind==="facebook"||x.kind==="website"?iconMarkup(x.kind):escapeHtml(x.icon||"↗")}</span><span class="link-label">${escapeHtml(x.title||"Link")}</span><span class="more">⋮</span></a>`).join("");
+}
+function fileAsData(file){return new Promise((resolve,reject)=>{if(!file)return resolve("");const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)})}
+function saveData(){try{localStorage.setItem("mylinkai-profile",JSON.stringify(data));render();return true}catch(e){alert("Storage is full. Please use smaller images.");return false}}
+function fillAdmin(){
+ $("adminName").value=data.name||"";$("adminWebsite").value=data.website||"";$("adminInstagram").value=data.instagram||"";$("adminFacebook").value=data.facebook||"";$("adminVerified").value=String(data.verified!==false);$("adminLiveTitle").value=data.liveTitle||"";$("adminLiveUrl").value=data.liveUrl||"";
+ drawExtraLinks();
+}
+function drawExtraLinks(){
+ $("extraLinks").innerHTML="";
+ (data.extraLinks||[]).forEach((item,i)=>{
+  const row=document.createElement("div");row.style.cssText="border:1px solid #ffffff25;border-radius:12px;padding:10px;margin:10px 0";
+  row.innerHTML=`<label class="field">Link title<input data-extra-title="${i}" value="${escapeHtml(item.title||"")}" placeholder="YouTube"></label><label class="field">Link URL<input data-extra-url="${i}" value="${escapeHtml(item.url||"")}" placeholder="https://..."></label><label class="field">Icon / emoji<input data-extra-icon="${i}" value="${escapeHtml(item.icon||"🔗")}" placeholder="🔗"></label><button class="btn secondary" type="button" data-extra-remove="${i}">Remove link</button>`;
+  $("extraLinks").appendChild(row);
+ });
+ $("extraLinks").querySelectorAll("[data-extra-remove]").forEach(b=>b.onclick=()=>{data.extraLinks.splice(Number(b.dataset.extraRemove),1);drawExtraLinks()});
+}
+$("adminCancelBtn").onclick=$("adminCloseBtn").onclick=()=>$("adminPanel").classList.remove("open");
+$("adminLoginBtn").onclick=()=>{if($("adminPassword").value==="akash777@"){fillAdmin();$("adminLogin").style.display="none";$("adminControls").style.display="block"}else alert("Incorrect demo password")};
+$("adminLogoutBtn").onclick=()=>{$("adminControls").style.display="none";$("adminLogin").style.display="block";$("adminPassword").value=""};
+$("addLinkBtn").onclick=()=>{data.extraLinks=data.extraLinks||[];data.extraLinks.push({title:"New link",url:"",icon:"🔗"});drawExtraLinks()};
+$("adminSaveBtn").onclick=async()=>{
+ data.name=$("adminName").value.trim()||"MyLinkAI";data.website=$("adminWebsite").value.trim();data.instagram=$("adminInstagram").value.trim();data.facebook=$("adminFacebook").value.trim();data.verified=$("adminVerified").value==="true";data.liveTitle="PusoAI";data.liveUrl="https://pusoai.online/";
+ const av=$("adminAvatar").files[0],bg=$("adminBackground").files[0];if(av)data.avatar=await fileAsData(av);if(bg)data.background=await fileAsData(bg);
+ $("extraLinks").querySelectorAll("[data-extra-title]").forEach(el=>{const i=Number(el.dataset.extraTitle);data.extraLinks[i].title=el.value.trim()});
+ $("extraLinks").querySelectorAll("[data-extra-url]").forEach(el=>{const i=Number(el.dataset.extraUrl);data.extraLinks[i].url=el.value.trim()});
+ $("extraLinks").querySelectorAll("[data-extra-icon]").forEach(el=>{const i=Number(el.dataset.extraIcon);data.extraLinks[i].icon=el.value.trim()||"🔗"});
+ if(saveData())alert("Profile updated in this browser.");
+};
+$("shareBtn").onclick=async()=>{const share={title:data.name||"MyLinkAI",text:"Check out my links",url:location.href};try{if(navigator.share)await navigator.share(share);else{await navigator.clipboard.writeText(location.href);alert("Page link copied")}}catch(e){}};
+// Hidden admin entry: press Ctrl + Shift + A (or Cmd + Shift + A on Mac).
+document.addEventListener("keydown", (event) => {
+  if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === "a") {
+    event.preventDefault();
+    $("adminPanel").classList.add("open");
+    $("adminLogin").style.display = "block";
+    $("adminControls").style.display = "none";
+    $("adminPassword").value = "";
+  }
+});
+render();
+</script>
+</body>
+</html>
